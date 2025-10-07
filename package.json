@@ -6,22 +6,32 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build-release": "node scripts/build-release.js",
+    "deploy-release": "az webapp deployment source config-zip --resource-group risager-dev --name risager-app-dev --src bin/risager-app-release.zip --verbose",
+    "release": "npm run build-release && npm run deploy-release",
+    "docker:deploy": "node scripts/docker-deploy.js",
+    "docker:clean": "docker compose down --rmi all --volumes && docker system prune -af --volumes",
+    "docker:rebuild": "npm run docker:clean && docker compose up --build -d"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.2",
+    "axios": "^1.12.2",
+    "next": "15.3.5",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.3.5"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
+    "archiver": "^5.3.2",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
-    "@eslint/eslintrc": "^3"
+    "swagger-typescript-api": "^13.2.14",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

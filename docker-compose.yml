@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: risager-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: risager
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - risager-network
+
+  minio:
+    image: minio/minio
+    container_name: risager-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - risager-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: risager-app
+    ports:
+      - "5062:5062"
+    depends_on:
+      - postgres
+      - minio
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=risager;Username=postgres;Password=postgres
+      - MinIO__Endpoint=minio:9000
+      - MinIO__AccessKey=minioadmin
+      - MinIO__SecretKey=minioadmin
+      - MinIO__BucketName=risager
+      - MinIO__UseSSL=false
+    networks:
+      - risager-network
+
+volumes:
+  postgres-data:
+  minio-data:
+
+networks:
+  risager-network:
+    driver: bridge
