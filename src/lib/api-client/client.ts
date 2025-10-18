@@ -377,6 +377,7 @@ export class Api<
       this.request<void, any>({
         path: `/api/Bookings/property/${propertyId}`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 

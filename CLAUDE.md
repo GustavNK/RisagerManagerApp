@@ -15,7 +15,7 @@ This is a full-stack family property booking system for "Risager Plantage" (Dani
 ### Frontend Development
 ```bash
 npm install                    # Install dependencies
-npm run dev                    # Start development server on localhost:3000
+npm run dev                    # Start development server on localhost:3000. Do not start it yourself, let the user start the server
 npm run dev -- --port 3000   # Force port 3000 if needed
 npm run build                 # Build for production (static export)
 npm run lint                  # Run ESLint
@@ -25,7 +25,7 @@ npm run lint                  # Run ESLint
 ```bash
 cd RisagerBackend
 dotnet restore                # Install dependencies
-dotnet run                    # Start backend on localhost:5062
+dotnet run                    # Start backend on localhost:5062. If the port is occupied, assume the banckend is running. Let the user close the backend to update it
 dotnet build                  # Build backend
 dotnet ef migrations add <name>    # Add new migration
 dotnet ef database update     # Apply migrations to database

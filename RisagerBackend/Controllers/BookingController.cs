@@ -24,23 +24,23 @@ public class BookingController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(List<BookingWithUserDto>), 200)]
-    public async Task<IActionResult> GetBookings()
+    public async Task<List<BookingWithUserDto>> GetBookings()
     {
-        var bookings = await _db.Bookings.ToListAsync();
-        var users = await _userManager.Users.ToListAsync();
-        var properties = await _db.Properties.ToListAsync();
+        List<Booking> bookings = await _db.Bookings.ToListAsync();
+        List<User> users = await _userManager.Users.ToListAsync();
+        List<Property> properties = await _db.Properties.ToListAsync();
 
-        var bookingsWithUser = bookings.Select(b =>
+        List<BookingWithUserDto> bookingsWithUser = bookings.Select(b =>
         {
-            var user = users.FirstOrDefault(u => u.UserName == b.UserId);
-            var property = properties.FirstOrDefault(p => p.Id == b.PropertyId);
-            var fullName = user != null ?
+            User? user = users.FirstOrDefault(u => u.UserName == b.UserId);
+            Property? property = properties.FirstOrDefault(p => p.Id == b.PropertyId);
+            string[] fullName = user != null ?
                 new[] { user.FirstName, user.LastName }.Where(n => !string.IsNullOrEmpty(n)).ToArray() :
                 Array.Empty<string>();
 
-            var nights = (b.EndDate - b.StartDate).Days;
-            var pricePerPersonPerNight = 30m; // Fixed price: 30 DKK per person per night
-            var totalPrice = nights * pricePerPersonPerNight * b.ExpectedPeople;
+            int nights = (b.EndDate - b.StartDate).Days;
+            decimal pricePerPersonPerNight = 30m; // Fixed price: 30 DKK per person per night
+            decimal totalPrice = nights * pricePerPersonPerNight * b.ExpectedPeople;
 
             return new BookingWithUserDto
             {
@@ -58,7 +58,7 @@ public class BookingController : ControllerBase
             };
         }).ToList();
 
-        return Ok(bookingsWithUser);
+        return bookingsWithUser;
     }
 
     /// <summary>
@@ -68,25 +68,25 @@ public class BookingController : ControllerBase
     [ProducesResponseType(typeof(List<BookingWithUserDto>), 200)]
     public async Task<IActionResult> GetBookingsByProperty(int propertyId)
     {
-        var bookings = await _db.Bookings
+        List<Booking> bookings = await _db.Bookings
             .Where(b => b.PropertyId == propertyId)
             .OrderBy(b => b.StartDate)
             .ToListAsync();
 
-        var users = await _userManager.Users.ToListAsync();
-        var properties = await _db.Properties.ToListAsync();
+        List<User> users = await _userManager.Users.ToListAsync();
+        List<Property> properties = await _db.Properties.ToListAsync();
 
-        var bookingsWithUser = bookings.Select(b =>
+        List<BookingWithUserDto> bookingsWithUser = bookings.Select(b =>
         {
-            var user = users.FirstOrDefault(u => u.UserName == b.UserId);
-            var property = properties.FirstOrDefault(p => p.Id == b.PropertyId);
-            var fullName = user != null ?
+            User? user = users.FirstOrDefault(u => u.UserName == b.UserId);
+            Property? property = properties.FirstOrDefault(p => p.Id == b.PropertyId);
+            string[] fullName = user != null ?
                 new[] { user.FirstName, user.LastName }.Where(n => !string.IsNullOrEmpty(n)).ToArray() :
                 Array.Empty<string>();
 
-            var nights = (b.EndDate - b.StartDate).Days;
-            var pricePerPersonPerNight = 30m; // Fixed price: 30 DKK per person per night
-            var totalPrice = nights * pricePerPersonPerNight * b.ExpectedPeople;
+            int nights = (b.EndDate - b.StartDate).Days;
+            decimal pricePerPersonPerNight = 30m; // Fixed price: 30 DKK per person per night
+            decimal totalPrice = nights * pricePerPersonPerNight * b.ExpectedPeople;
 
             return new BookingWithUserDto
             {
@@ -114,17 +114,19 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> CreateBooking([FromBody] Booking booking)
     {
         // Check for booking conflicts (overlapping dates for the same property)
-        var conflictingBookings = await _db.Bookings
+        List<Booking> conflictingBookings = await _db.Bookings
             .Where(b => b.PropertyId == booking.PropertyId &&
-                       (booking.StartDate < b.EndDate && booking.EndDate > b.StartDate))
+                       booking.StartDate < b.EndDate && booking.EndDate > b.StartDate)
             .ToListAsync();
 
         if (conflictingBookings.Any())
         {
-            return Conflict(new {
+            return Conflict(new
+            {
                 error = "Booking conflict detected",
                 message = "The selected dates overlap with an existing booking for this property",
-                conflictingBookings = conflictingBookings.Select(b => new {
+                conflictingBookings = conflictingBookings.Select(b => new
+                {
                     id = b.Id,
                     startDate = b.StartDate,
                     endDate = b.EndDate,
@@ -136,7 +138,8 @@ public class BookingController : ControllerBase
         // Validate dates
         if (booking.StartDate >= booking.EndDate)
         {
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 error = "Invalid dates",
                 message = "End date must be after start date"
             });
@@ -144,23 +147,25 @@ public class BookingController : ControllerBase
 
         if (booking.StartDate < DateTime.Today)
         {
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 error = "Invalid start date",
                 message = "Start date cannot be in the past"
             });
         }
 
         // Validate expected people count
-        if (booking.ExpectedPeople < 1 || booking.ExpectedPeople > 20)
+        if (booking.ExpectedPeople is < 1 or > 20)
         {
-            return BadRequest(new {
+            return BadRequest(new
+            {
                 error = "Invalid people count",
                 message = "Expected people must be between 1 and 20"
             });
         }
 
-        _db.Bookings.Add(booking);
-        await _db.SaveChangesAsync();
+        _ = _db.Bookings.Add(booking);
+        _ = await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetBookings), new { id = booking.Id }, booking);
     }
 
@@ -170,20 +175,23 @@ public class BookingController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBooking(int id)
     {
-        var booking = await _db.Bookings.FindAsync(id);
+        Booking? booking = await _db.Bookings.FindAsync(id);
         if (booking == null)
         {
-            return NotFound(new {
+            return NotFound(new
+            {
                 error = "Booking not found",
                 message = $"No booking found with ID {id}"
             });
         }
 
-        _db.Bookings.Remove(booking);
-        await _db.SaveChangesAsync();
-        return Ok(new {
+        _ = _db.Bookings.Remove(booking);
+        _ = await _db.SaveChangesAsync();
+        return Ok(new
+        {
             message = "Booking deleted successfully",
-            deletedBooking = new {
+            deletedBooking = new
+            {
                 id = booking.Id,
                 propertyId = booking.PropertyId,
                 userId = booking.UserId,

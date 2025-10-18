@@ -66,6 +66,6 @@ public class InvitationCodeDto
     public DateTime ExpiryDate { get; set; }
     public bool IsUsed { get; set; }
     public DateTime? UsedDate { get; set; }
-    public string? UsedByUserId { get; set; }
-    public string CreatedByUserId { get; set; } = string.Empty;
+    public User? UsedByUserId { get; set; }
+    public string? CreatedByUser { get; set; }
 }

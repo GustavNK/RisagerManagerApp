@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, getErrorMessage } from "@/lib/api";
+import { Header, Container } from "@/components/layout";
+import { Alert, Button, Card } from "@/components/ui";
 
 interface UserData {
   id: string;
@@ -104,46 +106,38 @@ export default function UsersPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center">
-        <div className="text-center">
+        <Card className="text-center p-8 max-w-md">
           <h1 className="text-2xl font-bold text-green-800 mb-4">Please log in to view users</h1>
-          <Link href="/login" className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg">
-            Login
-          </Link>
-        </div>
+          <Button asChild>
+            <Link href="/login">Login</Link>
+          </Button>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50">
-      {/* Header */}
-      <header className="bg-green-800/90 backdrop-blur-sm shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xl">🌲</span>
-              </div>
-              <h1 className="text-3xl font-bold text-white">Risager Plantage</h1>
-            </Link>
-            <Link href="/" className="text-green-100 hover:text-white">
-              ← Back to Home
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
-      {/* Users Table */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-green-100 overflow-hidden">
+      <main>
+        <Container size="lg" className="py-16">
+        <div className="mb-6">
+          <Button variant="tertiary" size="sm" asChild>
+            <Link href="/">← Tilbage til forsiden</Link>
+          </Button>
+        </div>
+        <Card className="overflow-hidden">
           <div className="px-8 py-6 border-b border-green-100">
-            <h2 className="text-3xl font-bold text-green-800">All Users</h2>
-            <p className="text-green-600 mt-2">Overview of all registered users and their next bookings</p>
+            <h1 className="text-3xl font-bold text-green-800">Brugerstyring</h1>
+            <p className="text-green-600 mt-2">Oversigt over alle registrerede brugere og deres næste bookinger</p>
           </div>
 
           {error && (
-            <div className="mx-8 mt-6 p-4 rounded-lg bg-red-100 text-red-800">
-              {error}
+            <div className="mx-8 mt-6">
+              <Alert variant="error">
+                {error}
+              </Alert>
             </div>
           )}
 
@@ -153,7 +147,7 @@ export default function UsersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="">
                 <thead className="bg-green-50">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Name</th>
@@ -203,22 +197,22 @@ export default function UsersPage() {
               </table>
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Invitation Codes Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-green-100 overflow-hidden mt-8">
+        <Card className="overflow-hidden mt-8">
           <div className="px-8 py-6 border-b border-green-100 flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold text-green-800">Invitation Codes</h2>
               <p className="text-green-600 mt-2">Generate invitation codes for new user registration</p>
             </div>
-            <button
+            <Button
               onClick={generateInvitationCode}
               disabled={loadingCodes}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+              isLoading={loadingCodes}
             >
               {loadingCodes ? "Generating..." : "Generate Code"}
-            </button>
+            </Button>
           </div>
 
           {invitationCodes.length === 0 ? (
@@ -227,7 +221,7 @@ export default function UsersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="">
                 <thead className="bg-green-50">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Code</th>
@@ -286,12 +280,13 @@ export default function UsersPage() {
                         </td>
                         <td className="px-6 py-4 text-sm">
                           {!code.isUsed && !isExpired && (
-                            <button
+                            <Button
                               onClick={() => copyToClipboard(code.code)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700"
                             >
                               Copy
-                            </button>
+                            </Button>
                           )}
                         </td>
                       </tr>
@@ -301,7 +296,8 @@ export default function UsersPage() {
               </table>
             </div>
           )}
-        </div>
+        </Card>
+        </Container>
       </main>
     </div>
   );
