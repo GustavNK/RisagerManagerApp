@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, getErrorMessage, getApiUrl } from "@/lib/api";
+import { Header, Container } from "@/components/layout";
+import { Button, Card, Label, Input } from "@/components/ui";
 
 interface Post {
   id: number;
@@ -171,130 +173,90 @@ export default function FeedPage() {
         .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
           font-weight: 700;
           margin: 0.5em 0 0.25em 0;
-          color: #1F2937;
+          color: var(--foreground);
         }
         .prose strong {
           font-weight: 700;
-          color: #111827;
+          color: var(--foreground);
         }
         .prose em {
           font-style: italic;
-          color: #374151;
+          color: var(--foreground);
+          opacity: 0.8;
         }
         .prose p {
-          color: #1F2937;
+          color: var(--foreground);
           margin: 0.75em 0;
         }
         .rich-text-editor {
-          color: #1F2937;
+          color: var(--foreground);
         }
         .rich-text-editor:focus {
-          color: #1F2937;
+          color: var(--foreground);
         }
       `}</style>
 
-      {/* Header */}
-      <header className="bg-green-800/90 backdrop-blur-sm shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            {/* Logo and Site Name */}
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xl">🌲</span>
-              </div>
-              <h1 className="text-3xl font-bold text-white">Risager Plantage</h1>
-            </Link>
+      <Header />
 
-            {/* Navigation and User Section */}
-            <div className="flex items-center space-x-6">
-              {/* Navigation */}
-              <nav className="hidden md:flex space-x-3 items-center">
-                <Link href="/" className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                  Home
-                </Link>
-                <Link href="/booking" className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                  Book Now
-                </Link>
-                <Link href="/bookings" className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                  View Bookings
-                </Link>
-              </nav>
-
-              {/* Divider */}
-              <div className="hidden md:block w-px h-6 bg-green-300"></div>
-
-              {/* User Section */}
-              <div className="flex items-center space-x-4">
-                <span className="text-green-100">
-                  Welcome, <span className="font-semibold">{user?.username}</span>
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main>
+        <Container size="md" className="py-16">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-green-800 mb-4">Community Feed</h2>
-          <p className="text-xl text-green-600">Share your experiences and connect with other guests</p>
+          <h1 className="text-4xl font-bold text-green-800 mb-4">Familiefeed</h1>
+          <p className="text-xl text-green-600">Del dine oplevelser og forbind med andre familiemedlemmer</p>
         </div>
 
         {/* Create Post Form */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-green-100 mb-8">
+        <Card className="p-8 mb-8">
           <h3 className="text-2xl font-semibold text-green-800 mb-6">Create a New Post</h3>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-green-700 mb-2">Title</label>
-              <input
+              <Label htmlFor="post-title">Title</Label>
+              <Input
+                id="post-title"
                 type="text"
                 value={newPostTitle}
                 onChange={(e) => setNewPostTitle(e.target.value)}
-                className="w-full px-4 py-3 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="Enter post title..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-green-700 mb-2">Content</label>
+              <Label htmlFor="content-editor">Content</Label>
               <div className="border border-green-200 rounded-lg overflow-hidden">
                 <div className="bg-green-50 px-4 py-2 border-b border-green-200 flex space-x-2">
-                  <button
+                  <Button
                     type="button"
                     onClick={handleBold}
-                    className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                    size="sm"
+                    className="font-bold"
                   >
                     B
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={handleItalic}
-                    className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors italic"
+                    size="sm"
+                    className="italic"
                   >
                     I
-                  </button>
+                  </Button>
                 </div>
                 <textarea
                   id="content-editor"
                   value={newPostContent}
                   onChange={(e) => setNewPostContent(e.target.value)}
                   rows={6}
-                  className="w-full px-4 py-3 rich-text-editor focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 rich-text-editor focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none border-0"
                   placeholder="Share your thoughts..."
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-green-700 mb-2">Attach File (optional)</label>
+              <Label htmlFor="file-upload">Attach File (optional)</Label>
               <input
+                id="file-upload"
                 type="file"
                 onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 className="w-full px-4 py-3 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -306,15 +268,17 @@ export default function FeedPage() {
               )}
             </div>
 
-            <button
+            <Button
               onClick={handlePostSubmit}
               disabled={createPostMutation.isPending || !newPostTitle.trim() || !newPostContent.trim()}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white py-3 px-6 rounded-lg transition-colors font-medium"
+              fullWidth
+              size="lg"
+              isLoading={createPostMutation.isPending}
             >
               {createPostMutation.isPending ? "Posting..." : "Create Post"}
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
 
         {/* Posts Feed */}
         <div className="space-y-6">
@@ -324,7 +288,7 @@ export default function FeedPage() {
             </div>
           ) : (
             posts.map((post) => (
-              <div key={post.id} className="bg-white/80 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-green-100">
+              <Card key={post.id} className="p-8">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-semibold text-green-800 mb-2">{post.title}</h3>
@@ -346,19 +310,20 @@ export default function FeedPage() {
                         <p className="text-sm font-medium text-green-800">Attachment:</p>
                         <p className="text-sm text-green-600">{post.attachmentOriginalName}</p>
                       </div>
-                      <button
+                      <Button
                         onClick={() => downloadFile(post)}
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                        size="sm"
                       >
                         Download
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
-              </div>
+              </Card>
             ))
           )}
         </div>
+        </Container>
       </main>
     </div>
   );

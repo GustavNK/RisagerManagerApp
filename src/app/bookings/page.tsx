@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, getErrorMessage, getApiUrl } from "@/lib/api";
+import { Header, Container } from "@/components/layout";
+import { Alert, Button, Card } from "@/components/ui";
 
 interface Booking {
   id: number;
@@ -120,12 +122,12 @@ export default function BookingsPage() {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
     onError: (error) => {
-      setError(getErrorMessage(error) || "Failed to delete booking.");
+      setError(getErrorMessage(error) || "Kunne ikke slette bookingen. Prøv venligst igen.");
     },
   });
 
   const deleteBooking = (bookingId: number) => {
-    if (!confirm("Are you sure you want to delete this booking? This action cannot be undone.")) {
+    if (!confirm("Er du sikker på, at du vil slette denne booking? Denne handling kan ikke fortrydes.")) {
       return;
     }
     deleteBookingMutation.mutate(bookingId);
@@ -147,84 +149,42 @@ export default function BookingsPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center">
-        <div className="text-center">
+        <Card className="text-center p-8 w-full max-w-md mx-auto">
           <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-2xl">🌲</span>
           </div>
-          <h2 className="text-2xl font-bold text-green-800 mb-4">Please Login</h2>
-          <p className="text-green-600 mb-6">You need to be logged in to view bookings.</p>
-          <Link href="/login" className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-all">
-            Login
-          </Link>
-        </div>
+          <h2 className="text-2xl font-bold text-green-800 mb-4">Log venligst ind</h2>
+          <p className="text-green-600 mb-6">Du skal være logget ind for at se bookinger.</p>
+          <Button asChild>
+            <Link href="/login">Log ind</Link>
+          </Button>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50">
-      {/* Header */}
-      <header className="bg-green-800/90 backdrop-blur-sm shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            {/* Logo and Site Name */}
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xl">🌲</span>
-              </div>
-              <h1 className="text-3xl font-bold text-white">Risager Plantage</h1>
-            </Link>
+      <Header />
 
-            {/* Navigation and User Section */}
-            <div className="flex items-center space-x-6">
-              {/* Navigation */}
-              <nav className="hidden md:flex space-x-3 items-center">
-                <Link href="/" className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                  Home
-                </Link>
-                <Link href="/feed" className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                  Feed
-                </Link>
-                <Link href="/booking" className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
-                  Book Now
-                </Link>
-              </nav>
-
-              {/* Divider */}
-              <div className="hidden md:block w-px h-6 bg-green-300"></div>
-
-              {/* User Section */}
-              <div className="flex items-center space-x-4">
-                <span className="text-green-100">
-                  Welcome, <span className="font-semibold">{user?.username}</span>
-                </span>
-                <button
-                  onClick={() => {
-                    localStorage.removeItem('currentUser');
-                    router.push('/login');
-                  }}
-                  className="bg-green-700 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
+      <main>
+        <Container size="lg" className="py-16">
+        <div className="mb-6">
+          <Button variant="tertiary" size="sm" asChild>
+            <Link href="/">← Tilbage til forsiden</Link>
+          </Button>
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-green-800 mb-4">
-            {selectedHouse ? `${selectedHouse.name} Bookings` : "All Bookings"}
-          </h2>
+          <h1 className="text-4xl font-bold text-green-800 mb-4">
+            {selectedHouse ? `${selectedHouse.name} Bookinger` : "Alle Bookinger"}
+          </h1>
           <p className="text-xl text-green-600">
-            {selectedHouse ? `Reservations for ${selectedHouse.name}` : "Overview of all vacation house reservations"}
+            {selectedHouse ? `Reservationer for ${selectedHouse.name}` : "Oversigt over alle feriehusreservationer"}
           </p>
         </div>
 
         {/* House Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
           <div
             className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border-2 transition-all cursor-pointer ${
               !selectedHouse
@@ -237,9 +197,9 @@ export default function BookingsPage() {
           >
             <div className="p-6">
               <div className="text-4xl mb-3 text-center">🏘️</div>
-              <h3 className="text-xl font-bold text-green-800 mb-4 text-center">All Houses</h3>
+              <h3 className="text-xl font-bold text-green-800 mb-4 text-center">Alle huse</h3>
               <div className="text-center">
-                <span className="text-green-600">View all bookings</span>
+                <span className="text-green-600">Se alle bookinger</span>
               </div>
             </div>
           </div>
@@ -268,9 +228,9 @@ export default function BookingsPage() {
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 max-w-4xl mx-auto">
+          <Alert variant="error" className="mb-6 max-w-5xl mx-auto">
             {error}
-          </div>
+          </Alert>
         )}
 
         {loading || !bookings ? (
@@ -278,20 +238,17 @@ export default function BookingsPage() {
             <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
               <span className="text-white font-bold text-2xl">🌲</span>
             </div>
-            <p className="text-green-600">Loading bookings...</p>
+            <p className="text-green-600">Indlæser bookinger...</p>
           </div>
         ) : bookings.length === 0 ? (
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-8 text-center max-w-2xl mx-auto border border-green-100">
+          <Card className="p-8 text-center max-w-5xl mx-auto">
             <div className="text-6xl mb-4">📅</div>
-            <h3 className="text-2xl font-bold text-green-800 mb-2">No Bookings Yet</h3>
-            <p className="text-green-600 mb-6">There are no bookings in the system yet.</p>
-            <Link
-              href="/booking"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
-            >
-              Make First Booking
-            </Link>
-          </div>
+            <h3 className="text-2xl font-bold text-green-800 mb-2">Ingen bookinger endnu</h3>
+            <p className="text-green-600 mb-6">Der er ingen bookinger i systemet endnu.</p>
+            <Button asChild size="lg">
+              <Link href="/booking">Lav første booking</Link>
+            </Button>
+          </Card>
         ) : (
           <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-green-100 overflow-hidden">
             {/* Desktop Table */}
@@ -300,13 +257,13 @@ export default function BookingsPage() {
                 <thead className="bg-green-700">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">Booking ID</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">House</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Guest</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Check-in</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Check-out</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Nights</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Total Price</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Actions</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Hus</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Gæst</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Ind</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Ud</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Nætter</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Total pris</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Handlinger</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-green-100">
@@ -326,12 +283,13 @@ export default function BookingsPage() {
                         {booking.totalPrice.toLocaleString('da-DK')} DKK
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <button
+                        {/* <Button
                           onClick={() => deleteBooking(booking.id)}
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                          variant="destructive"
+                          size="sm"
                         >
-                          Delete
-                        </button>
+                          Slet
+                        </Button> */}
                       </td>
                     </tr>
                   ))}
@@ -357,19 +315,20 @@ export default function BookingsPage() {
                   <h3 className="text-lg font-bold text-green-800 mb-1">
                     {getHouseName(booking.propertyId)}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-2">Guest: {booking.userFullName}</p>
+                  <p className="text-sm text-gray-600 mb-2">Gæst: {booking.userFullName}</p>
                   <div className="flex justify-between text-sm text-gray-600 mb-3">
                     <span>{formatDate(booking.startDate)}</span>
                     <span>→</span>
                     <span>{formatDate(booking.endDate)}</span>
                   </div>
                   <div className="flex justify-end">
-                    <button
+                    <Button
                       onClick={() => deleteBooking(booking.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                      variant="destructive"
+                      size="sm"
                     >
-                      Delete
-                    </button>
+                      Slet
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -379,15 +338,13 @@ export default function BookingsPage() {
 
         {bookings && (
           <div className="text-center mt-8">
-            <p className="text-green-600 mb-4">Total bookings: {bookings.length}</p>
-            <Link
-              href="/booking"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-all inline-block"
-            >
-              Make New Booking
-            </Link>
+            <p className="text-green-600 mb-4">Antal bookinger: {bookings.length}</p>
+            <Button asChild size="lg">
+              <Link href="/booking">Lav ny booking</Link>
+            </Button>
           </div>
         )}
+        </Container>
       </main>
     </div>
   );

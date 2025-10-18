@@ -65,7 +65,6 @@ namespace RisagerBackend.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<string>("CreatedByUserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")

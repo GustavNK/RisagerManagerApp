@@ -18,6 +18,5 @@ public class InvitationCode
 
     public string? UsedByUserId { get; set; }
 
-    [Required]
-    public string CreatedByUserId { get; set; } = string.Empty;
+    public string? CreatedByUserId { get; set; }
 }
