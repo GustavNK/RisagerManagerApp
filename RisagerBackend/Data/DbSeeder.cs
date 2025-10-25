@@ -6,14 +6,17 @@ namespace RisagerBackend.Data
     {
         public static async Task SeedAdminUser(IServiceProvider serviceProvider)
         {
-            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
-            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+            UserManager<User> userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+            RoleManager<IdentityRole> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            ILogger<Program> logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+
+            _ = await roleManager.CreateAsync(new IdentityRole("Admin"));
 
             const string adminUsername = "admin";
             const string adminPassword = "admin";
 
             // Check if admin user already exists
-            var existingAdmin = await userManager.FindByNameAsync(adminUsername);
+            User? existingAdmin = await userManager.FindByNameAsync(adminUsername);
             if (existingAdmin != null)
             {
                 logger.LogInformation("Admin user already exists. Skipping seeding.");
@@ -21,7 +24,7 @@ namespace RisagerBackend.Data
             }
 
             // Create admin user
-            var adminUser = new User
+            User adminUser = new()
             {
                 UserName = adminUsername,
                 Email = "admin@risager.local",
@@ -30,7 +33,9 @@ namespace RisagerBackend.Data
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(adminUser, adminPassword);
+            IdentityResult result = await userManager.CreateAsync(adminUser, adminPassword);
+
+            _ = await userManager.AddToRoleAsync(adminUser, "Admin");
 
             if (result.Succeeded)
             {
@@ -45,8 +50,8 @@ namespace RisagerBackend.Data
 
         public static async Task SeedProperties(IServiceProvider serviceProvider)
         {
-            var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
-            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+            ApplicationDbContext context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            ILogger<Program> logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
             // Check if properties already exist
             if (context.Properties.Any())
@@ -55,14 +60,14 @@ namespace RisagerBackend.Data
                 return;
             }
 
-            var properties = new[]
+            Property[] properties = new[]
             {
                 new Property { Id = 1, Name = "Røde Hus" },
                 new Property { Id = 2, Name = "Søhuset" }
             };
 
             await context.Properties.AddRangeAsync(properties);
-            await context.SaveChangesAsync();
+            _ = await context.SaveChangesAsync();
 
             logger.LogInformation("Properties seeded successfully.");
         }

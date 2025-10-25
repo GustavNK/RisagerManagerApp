@@ -176,6 +176,13 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> DeleteBooking(int id)
     {
         Booking? booking = await _db.Bookings.FindAsync(id);
+        //string? currentUserName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //string? currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        //if (booking?.UserId != currentUserName || currentUserRole == "Admin")
+        //{
+        //    return Forbid("The user trying to delete this booking is not the one who created it");
+        //}
+
         if (booking == null)
         {
             return NotFound(new

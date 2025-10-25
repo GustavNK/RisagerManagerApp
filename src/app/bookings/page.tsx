@@ -31,12 +31,32 @@ interface VacationHouse {
   features: string[];
 }
 
+// Custom hook to check if a booking belongs to the current user
+const useIsUserBooking = () => {
+  const [currentUsername, setCurrentUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setCurrentUsername(user.username);
+    }
+  }, []);
+
+  const isUserBooking = (booking: Booking) => {
+    return booking.userId === currentUsername;
+  };
+
+  return isUserBooking;
+};
+
 export default function BookingsPage() {
   const [user, setUser] = useState<{ username: string } | null>(null);
   const [error, setError] = useState("");
   const [selectedHouse, setSelectedHouse] = useState<VacationHouse | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const isUserBooking = useIsUserBooking();
 
   const vacationHouses: VacationHouse[] = [
     {
@@ -283,13 +303,14 @@ export default function BookingsPage() {
                         {booking.totalPrice.toLocaleString('da-DK')} DKK
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        {/* <Button
+                        <Button
                           onClick={() => deleteBooking(booking.id)}
                           variant="destructive"
                           size="sm"
+                          // hidden={!isUserBooking(booking)}
                         >
                           Slet
-                        </Button> */}
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -326,6 +347,7 @@ export default function BookingsPage() {
                       onClick={() => deleteBooking(booking.id)}
                       variant="destructive"
                       size="sm"
+                      hidden={!isUserBooking(booking)}
                     >
                       Slet
                     </Button>
