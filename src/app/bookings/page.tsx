@@ -31,32 +31,12 @@ interface VacationHouse {
   features: string[];
 }
 
-// Custom hook to check if a booking belongs to the current user
-const useIsUserBooking = () => {
-  const [currentUsername, setCurrentUsername] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setCurrentUsername(user.username);
-    }
-  }, []);
-
-  const isUserBooking = (booking: Booking) => {
-    return booking.userId === currentUsername;
-  };
-
-  return isUserBooking;
-};
-
 export default function BookingsPage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
   const [error, setError] = useState("");
   const [selectedHouse, setSelectedHouse] = useState<VacationHouse | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
-  const isUserBooking = useIsUserBooking();
 
   const vacationHouses: VacationHouse[] = [
     {
@@ -107,11 +87,11 @@ export default function BookingsPage() {
   };
 
   const { data: bookings = [], isLoading: loading, error: queryError } = useQuery({
-    queryKey: ['bookings', selectedHouse?.id],
+    queryKey: ['bookings', selectedHouse?.id, 'future'],
     queryFn: async () => {
       const url = selectedHouse?.id
-        ? `${getApiUrl()}/api/Bookings/property/${selectedHouse.id}`
-        : `${getApiUrl()}/api/Bookings`;
+        ? `${getApiUrl()}/api/Bookings/property/${selectedHouse.id}/future`
+        : `${getApiUrl()}/api/Bookings/future`;
 
       console.log('Fetching bookings from:', url);
 
@@ -307,7 +287,6 @@ export default function BookingsPage() {
                           onClick={() => deleteBooking(booking.id)}
                           variant="destructive"
                           size="sm"
-                          // hidden={!isUserBooking(booking)}
                         >
                           Slet
                         </Button>
@@ -347,7 +326,6 @@ export default function BookingsPage() {
                       onClick={() => deleteBooking(booking.id)}
                       variant="destructive"
                       size="sm"
-                      hidden={!isUserBooking(booking)}
                     >
                       Slet
                     </Button>

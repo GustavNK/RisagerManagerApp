@@ -28,7 +28,7 @@ interface Booking {
 }
 
 export default function BookingPage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<VacationHouse | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -67,10 +67,10 @@ export default function BookingPage() {
   }, [router]);
 
   const { data: existingBookings = [] } = useQuery({
-    queryKey: ['bookings', 'property', selectedHouse?.id],
+    queryKey: ['bookings', 'property', selectedHouse?.id, 'future'],
     queryFn: async () => {
       if (!selectedHouse?.id) return [];
-      const response = await api.api.bookingsPropertyDetail(selectedHouse.id, { format: 'json' });
+      const response = await api.api.bookingsPropertyFutureDetail(selectedHouse.id, { format: 'json' });
       return ((response.data as unknown) as Booking[]) || [];
     },
     enabled: !!selectedHouse?.id,
@@ -79,7 +79,7 @@ export default function BookingPage() {
   const bookingMutation = useMutation({
     mutationFn: (data: {
       propertyId: number;
-      userId: string;
+      userEmail: string;
       startDate: string;
       endDate: string;
       expectedPeople: number;
@@ -149,7 +149,7 @@ export default function BookingPage() {
 
     bookingMutation.mutate({
       propertyId: selectedHouse.id,
-      userId: user?.username || "",
+      userEmail: "", // Empty means use current logged-in user
       startDate: startDate,
       endDate: endDate,
       expectedPeople: expectedPeople,

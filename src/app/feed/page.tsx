@@ -20,7 +20,7 @@ interface Post {
 }
 
 export default function FeedPage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
@@ -87,7 +87,7 @@ export default function FeedPage() {
     createPostMutation.mutate({
       title: newPostTitle,
       content: newPostContent,
-      authorName: user?.username || "Anonymous",
+      authorName: user?.email || "Anonymous",
       file: selectedFile || undefined,
     });
   };

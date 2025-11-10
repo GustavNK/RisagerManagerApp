@@ -8,7 +8,6 @@ import { Header, Container } from "@/components/layout";
 import { Alert, Button, Card, Label, Input } from "@/components/ui";
 
 interface UserProfile {
-  username: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -16,7 +15,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -123,14 +122,15 @@ export default function ProfilePage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                type="text"
-                id="username"
-                value={profile?.username || ""}
-                disabled
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Enter your email"
               />
-              <p className="text-sm text-gray-600 mt-1">Username cannot be changed</p>
             </div>
 
             <div>
@@ -154,18 +154,6 @@ export default function ProfilePage() {
                 value={formData.lastName}
                 onChange={handleInputChange}
                 placeholder="Enter your last name"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email"
               />
             </div>
 

@@ -9,11 +9,10 @@ import { Alert, Button, Card } from "@/components/ui";
 
 interface UserData {
   id: string;
-  username: string;
+  email: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  email: string;
   nextBookingDate?: string;
   nextBookingPropertyName?: string;
 }
@@ -30,7 +29,7 @@ interface InvitationCode {
 }
 
 export default function UsersPage() {
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const queryClient = useQueryClient();
@@ -151,9 +150,8 @@ export default function UsersPage() {
                 <thead className="bg-green-50">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Name</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Username</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Phone Number</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Email</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Phone Number</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-green-800">Next Booking</th>
                   </tr>
                 </thead>
@@ -166,13 +164,10 @@ export default function UsersPage() {
                         {fullName}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-700">
-                        {userData.username}
+                        {userData.email || "-"}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-700">
                         {userData.phoneNumber || "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
-                        {userData.email || "-"}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-700">
                         {userData.nextBookingDate ? (

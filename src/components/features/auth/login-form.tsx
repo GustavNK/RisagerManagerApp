@@ -12,17 +12,17 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSuccess, onError }: LoginFormProps) {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const router = useRouter()
 
   const loginMutation = useMutation({
-    mutationFn: (data: { username: string; password: string }) =>
+    mutationFn: (data: { email: string; password: string }) =>
       api.api.userLoginCreate(data),
     onSuccess: () => {
-      localStorage.setItem('currentUser', JSON.stringify({ username }))
+      localStorage.setItem('currentUser', JSON.stringify({ email }))
       setSuccess('Login lykkedes! Du vil blive omdirigeret...')
       setError('')
       if (onSuccess) {
@@ -30,10 +30,10 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
       }
       setTimeout(() => {
         router.push('/')
-      }, 1500)
+      }, 500)
     },
     onError: (error) => {
-      const errorMessage = getErrorMessage(error) || 'Login mislykkedes. Kontroller venligst dit brugernavn og adgangskode.'
+      const errorMessage = getErrorMessage(error) || 'Login mislykkedes. Kontroller venligst din e-mail og adgangskode.'
       setError(errorMessage)
       setSuccess('')
       if (onError) {
@@ -45,7 +45,7 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
   const handleLogin = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     loginMutation.mutate({
-      username,
+      email,
       password,
     })
   }
@@ -66,15 +66,15 @@ export function LoginForm({ onSuccess, onError }: LoginFormProps) {
 
       <form className="space-y-4">
         <div>
-          <Label htmlFor="username" required>
-            Brugernavn
+          <Label htmlFor="email" required>
+            E-mail
           </Label>
           <Input
-            id="username"
-            type="text"
-            placeholder="Indtast dit brugernavn"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            type="email"
+            placeholder="Indtast din e-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>

@@ -8,7 +8,7 @@ export const getApiUrl = (): string => {
   }
 
   // In development, use localhost backend
-  return 'http://localhost:5062';
+  return 'https://localhost:7122';
 };
 
 export const API_BASE_URL = getApiUrl();

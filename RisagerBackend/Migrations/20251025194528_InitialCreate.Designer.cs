@@ -12,7 +12,7 @@ using RisagerBackend.Data;
 namespace RisagerBackend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251006103211_InitialCreate")]
+    [Migration("20251025194528_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace RisagerBackend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -51,6 +51,8 @@ namespace RisagerBackend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Bookings");
                 });
 
@@ -68,7 +70,6 @@ namespace RisagerBackend.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<string>("CreatedByUserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
@@ -300,16 +301,9 @@ namespace RisagerBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -388,6 +382,17 @@ namespace RisagerBackend.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Booking", b =>
+                {
+                    b.HasOne("User", "User")
+                        .WithMany("Bookings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -437,6 +442,11 @@ namespace RisagerBackend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("User", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }
