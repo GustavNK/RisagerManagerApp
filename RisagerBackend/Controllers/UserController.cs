@@ -49,7 +49,7 @@ public class UserController : ControllerBase
 
         User user = new()
         {
-            UserName = userDto.Username,
+            UserName = userDto.Email, // Use email as username
             Email = userDto.Email,
             FirstName = userDto.FirstName,
             LastName = userDto.LastName,
@@ -85,7 +85,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
         Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(
-            loginDto.Username,
+            loginDto.Email, // Email is used as username
             loginDto.Password,
             loginDto.RememberMe,
             false);
@@ -111,7 +111,7 @@ public class UserController : ControllerBase
             ? NotFound()
             : Ok(new
             {
-                username = user.UserName,
+                id = user.Id,
                 email = user.Email,
                 firstName = user.FirstName,
                 lastName = user.LastName,
@@ -142,6 +142,7 @@ public class UserController : ControllerBase
         user.LastName = updateDto.LastName;
         user.PhoneNumber = updateDto.PhoneNumber;
         user.Email = updateDto.Email;
+        user.UserName = updateDto.Email; // Keep username in sync with email
 
         IdentityResult result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
@@ -171,12 +172,12 @@ public class UserController : ControllerBase
         {
             // First, let's check all bookings for this user (for debugging)
             List<Booking> allUserBookings = await _context.Bookings
-                .Where(b => b.UserId == user.UserName)
+                .Where(b => b.UserId == user.Id)
                 .ToListAsync();
 
             // Then get the next future booking
             Booking? nextBooking = await _context.Bookings
-                .Where(b => b.UserId == user.UserName && b.StartDate > DateTime.UtcNow)
+                .Where(b => b.UserId == user.Id && b.StartDate > DateTime.UtcNow)
                 .OrderBy(b => b.StartDate)
                 .FirstOrDefaultAsync();
 
@@ -184,16 +185,15 @@ public class UserController : ControllerBase
                 await _context.Properties.FirstOrDefaultAsync(p => p.Id == nextBooking.PropertyId) : null;
 
             // Debug: Log the user ID and booking count
-            Console.WriteLine($"User: {user.UserName} (ID: {user.Id}), Total bookings: {allUserBookings.Count}, Future bookings: {(nextBooking != null ? 1 : 0)}");
+            Console.WriteLine($"User: {user.Email} (ID: {user.Id}), Total bookings: {allUserBookings.Count}, Future bookings: {(nextBooking != null ? 1 : 0)}");
 
             userList.Add(new UserListDto
             {
                 Id = user.Id,
-                Username = user.UserName ?? "",
+                Email = user.Email ?? "",
                 FirstName = user.FirstName ?? "",
                 LastName = user.LastName ?? "",
                 PhoneNumber = user.PhoneNumber ?? "",
-                Email = user.Email ?? "",
                 NextBookingDate = nextBooking?.StartDate,
                 NextBookingPropertyName = property?.Name
             });
@@ -217,7 +217,7 @@ public class UserController : ControllerBase
         {
             bookings,
             properties,
-            users = users.Select(u => new { u.Id, u.UserName }).ToList(),
+            users = users.Select(u => new { u.Id, u.Email }).ToList(),
             currentTime = DateTime.UtcNow
         });
     }

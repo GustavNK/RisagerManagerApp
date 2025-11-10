@@ -12,22 +12,22 @@ namespace RisagerBackend.Data
 
             _ = await roleManager.CreateAsync(new IdentityRole("Admin"));
 
-            const string adminUsername = "admin";
+            const string adminEmail = "admin@risager.dk";
             const string adminPassword = "admin";
 
             // Check if admin user already exists
-            User? existingAdmin = await userManager.FindByNameAsync(adminUsername);
+            User? existingAdmin = await userManager.FindByNameAsync(adminEmail);
             if (existingAdmin != null)
             {
                 logger.LogInformation("Admin user already exists. Skipping seeding.");
                 return;
             }
 
-            // Create admin user
+            // Create admin user (using email as username)
             User adminUser = new()
             {
-                UserName = adminUsername,
-                Email = "admin@risager.local",
+                UserName = adminEmail,
+                Email = adminEmail,
                 FirstName = "Administrator",
                 LastName = "User",
                 EmailConfirmed = true
@@ -39,7 +39,7 @@ namespace RisagerBackend.Data
 
             if (result.Succeeded)
             {
-                logger.LogInformation("Admin user created successfully: {Username}", adminUsername);
+                logger.LogInformation("Admin user created successfully: {Email}", adminEmail);
             }
             else
             {

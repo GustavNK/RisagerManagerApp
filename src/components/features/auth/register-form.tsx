@@ -11,7 +11,6 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ onSuccess, onError }: RegisterFormProps) {
-  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const [firstName, setFirstName] = useState('')
@@ -23,7 +22,6 @@ export function RegisterForm({ onSuccess, onError }: RegisterFormProps) {
 
   const registerMutation = useMutation({
     mutationFn: (data: {
-      username: string
       email: string
       password: string
       firstName: string
@@ -51,7 +49,6 @@ export function RegisterForm({ onSuccess, onError }: RegisterFormProps) {
   const handleRegister = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     registerMutation.mutate({
-      username,
       email,
       password,
       firstName,
@@ -76,20 +73,6 @@ export function RegisterForm({ onSuccess, onError }: RegisterFormProps) {
       )}
 
       <form className="space-y-4">
-        <div>
-          <Label htmlFor="username" required>
-            Brugernavn
-          </Label>
-          <Input
-            id="username"
-            type="text"
-            placeholder="Indtast dit brugernavn"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-
         <div>
           <Label htmlFor="invitationCode" required>
             Invitationskode

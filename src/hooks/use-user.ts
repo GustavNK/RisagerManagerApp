@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 
 interface User {
-  username: string
+  email: string
 }
 
 export function useUser() {

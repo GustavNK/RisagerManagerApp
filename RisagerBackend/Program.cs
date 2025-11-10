@@ -61,7 +61,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequiredUniqueChars = 1;
 
     // Configure user requirements
-    options.User.RequireUniqueEmail = false;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedEmail = false; // Using invitation codes instead
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();

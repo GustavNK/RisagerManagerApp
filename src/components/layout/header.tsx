@@ -12,7 +12,7 @@ export interface HeaderProps {
 
 const Header = React.forwardRef<HTMLElement, HeaderProps>(
   ({ showNavigation = true, showUserSection = true }, ref) => {
-    const [user, setUser] = useState<{ username: string } | null>(null)
+    const [user, setUser] = useState<{ email: string } | null>(null)
     const [loading, setLoading] = useState(true)
     const router = useRouter()
 
@@ -102,7 +102,7 @@ const Header = React.forwardRef<HTMLElement, HeaderProps>(
                   {/* User Section */}
                   <div className="flex items-center space-x-4">
                     <span className="text-green-100">
-                      Velkommen, <span className="font-semibold">{user.username}</span>
+                      Velkommen, <span className="font-semibold">{user.email}</span>
                     </span>
                     <button
                       onClick={handleLogout}
