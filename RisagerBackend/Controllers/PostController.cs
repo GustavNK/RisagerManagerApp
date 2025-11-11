@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RisagerBackend.Data;
@@ -8,6 +9,7 @@ namespace RisagerBackend.Controllers;
 [ApiController]
 [Route("api/[controller]s")]
 [Tags("Post")]
+[Authorize]
 public class PostController : ControllerBase
 {
     private readonly ApplicationDbContext _db;

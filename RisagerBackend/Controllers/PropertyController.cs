@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RisagerBackend.Data;
@@ -7,6 +8,7 @@ namespace RisagerBackend.Controllers;
 [ApiController]
 [Route("api/[controller]s")]
 [Tags("Property")]
+[Authorize]
 public class PropertyController : ControllerBase
 {
     private readonly ApplicationDbContext _db;

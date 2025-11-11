@@ -70,7 +70,7 @@ export default function BookingPage() {
     queryKey: ['bookings', 'property', selectedHouse?.id, 'future'],
     queryFn: async () => {
       if (!selectedHouse?.id) return [];
-      const response = await api.api.bookingsPropertyFutureDetail(selectedHouse.id, { format: 'json' });
+      const response = await api.api.bookingsPropertyFutureList(selectedHouse.id, { format: 'json' });
       return ((response.data as unknown) as Booking[]) || [];
     },
     enabled: !!selectedHouse?.id,

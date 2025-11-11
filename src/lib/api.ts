@@ -8,7 +8,7 @@ export const getApiUrl = (): string => {
   }
 
   // In development, use localhost backend
-  return 'https://localhost:7122';
+  return 'http://localhost:5062';
 };
 
 export const API_BASE_URL = getApiUrl();
@@ -16,12 +16,6 @@ export const API_BASE_URL = getApiUrl();
 // Create a singleton API instance
 export const api = new Api({
   baseUrl: getApiUrl(),
-  baseApiParams: {
-    credentials: 'include', // Important for cookie-based authentication
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  },
 })
 
 // Helper to handle API errors

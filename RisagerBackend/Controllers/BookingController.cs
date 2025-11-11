@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ namespace RisagerBackend.Controllers;
 [ApiController]
 [Route("api/[controller]s")]
 [Tags("Booking")]
+[Authorize]
 public class BookingController : ControllerBase
 {
     private readonly ApplicationDbContext _db;

@@ -34,7 +34,7 @@ builder.Services.AddCors(options =>
 // Configure Swagger/OpenAPI
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Risager API", Version = "v1" });
     c.EnableAnnotations();
 });
 builder.Services.AddEndpointsApiExplorer();
@@ -119,8 +119,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1"));
 }
-
-app.UseHttpsRedirection();
+else
+{
+    // Only redirect to HTTPS in production
+    app.UseHttpsRedirection();
+}
 
 // Use CORS
 app.UseCors("AllowFrontend");

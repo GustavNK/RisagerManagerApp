@@ -10,6 +10,7 @@ namespace RisagerBackend.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Tags("User")]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
@@ -30,6 +31,7 @@ public class UserController : ControllerBase
     /// Register a new user with an invitation code
     /// </summary>
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] UserDto userDto)
     {
         // Validate invitation code
@@ -82,6 +84,7 @@ public class UserController : ControllerBase
     /// Login user
     /// </summary>
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
         Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(
@@ -226,13 +229,13 @@ public class UserController : ControllerBase
     /// Generate invitation code
     /// </summary>
     [HttpPost("invitation-codes")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> CreateInvitationCode()
     {
         string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userId == null)
         {
-            //return Unauthorized();
+            return Unauthorized();
         }
 
         // Generate a unique invitation code

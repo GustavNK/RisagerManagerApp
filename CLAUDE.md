@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a full-stack family property booking system for "Risager Plantage" (Danish forest retreat) built as a monorepo with:
 - **Frontend**: Next.js 15 + React 19 + TypeScript + TailwindCSS (port 3000)
-- **Backend**: .NET 8 Web API + Entity Framework + ASP.NET Core Identity (port 5062)
+- **Backend**: .NET 8 Web API + Entity Framework + ASP.NET Core Identity (http port 5062, https 7122)
 - **Database**: PostgreSQL (Docker container or Azure SQL for legacy deployments)
 - **Storage**: MinIO (Docker S3-compatible) or Azure Blob Storage for file attachments
 

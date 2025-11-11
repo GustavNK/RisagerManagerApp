@@ -10,12 +10,31 @@
  * ---------------------------------------------------------------
  */
 
-export interface Booking {
+export interface BookingWithUserDto {
   /** @format int32 */
   id?: number;
   /** @format int32 */
   propertyId?: number;
   userId?: string | null;
+  /** @format date-time */
+  startDate?: string;
+  /** @format date-time */
+  endDate?: string;
+  /** @format int32 */
+  expectedPeople?: number;
+  userFirstName?: string | null;
+  userLastName?: string | null;
+  userFullName?: string | null;
+  /** @format double */
+  totalPrice?: number;
+  /** @format int32 */
+  nights?: number;
+}
+
+export interface CreateBookingDto {
+  /** @format int32 */
+  propertyId?: number;
+  userEmail?: string | null;
   /** @format date-time */
   startDate?: string;
   /** @format date-time */
@@ -31,7 +50,7 @@ export interface CreatePostDto {
 }
 
 export interface LoginDto {
-  username?: string | null;
+  email?: string | null;
   password?: string | null;
   rememberMe?: boolean;
 }
@@ -51,9 +70,6 @@ export interface Property {
   /** @format int32 */
   id?: number;
   name?: string | null;
-  address?: string | null;
-  /** @format double */
-  price?: number;
 }
 
 export interface UpdateUserDto {
@@ -64,7 +80,6 @@ export interface UpdateUserDto {
 }
 
 export interface UserDto {
-  username?: string | null;
   email?: string | null;
   password?: string | null;
   firstName?: string | null;
@@ -344,9 +359,10 @@ export class Api<
      * @request GET:/api/Bookings
      */
     bookingsList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<BookingWithUserDto[], any>({
         path: `/api/Bookings`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -357,7 +373,7 @@ export class Api<
      * @name BookingsCreate
      * @request POST:/api/Bookings
      */
-    bookingsCreate: (data: Booking, params: RequestParams = {}) =>
+    bookingsCreate: (data: CreateBookingDto, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/Bookings`,
         method: "POST",
@@ -374,8 +390,41 @@ export class Api<
      * @request GET:/api/Bookings/property/{propertyId}
      */
     bookingsPropertyDetail: (propertyId: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<BookingWithUserDto[], any>({
         path: `/api/Bookings/property/${propertyId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Booking
+     * @name BookingsFutureList
+     * @request GET:/api/Bookings/future
+     */
+    bookingsFutureList: (params: RequestParams = {}) =>
+      this.request<BookingWithUserDto[], any>({
+        path: `/api/Bookings/future`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Booking
+     * @name BookingsPropertyFutureList
+     * @request GET:/api/Bookings/property/{propertyId}/future
+     */
+    bookingsPropertyFutureList: (
+      propertyId: number,
+      params: RequestParams = {},
+    ) =>
+      this.request<BookingWithUserDto[], any>({
+        path: `/api/Bookings/property/${propertyId}/future`,
         method: "GET",
         format: "json",
         ...params,
@@ -639,20 +688,6 @@ export class Api<
       this.request<void, any>({
         path: `/api/User/invitation-codes`,
         method: "POST",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags User
-     * @name UserInvitationCodesList
-     * @request GET:/api/User/invitation-codes
-     */
-    userInvitationCodesList: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/api/User/invitation-codes`,
-        method: "GET",
         ...params,
       }),
   };
