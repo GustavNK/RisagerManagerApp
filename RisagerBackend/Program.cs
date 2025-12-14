@@ -27,7 +27,8 @@ builder.Services.AddCors(options =>
             // In production, allow same-origin requests (frontend served by same server)
             policy.AllowAnyOrigin()
                   .AllowAnyMethod()
-                  .AllowAnyHeader();
+                  .AllowAnyHeader()
+                  .AllowCredentials();
         }
     });
 });
