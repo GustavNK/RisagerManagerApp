@@ -323,12 +323,6 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> DeleteBooking(int id)
     {
         Booking? booking = await _db.Bookings.FindAsync(id);
-        //string? currentUserName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //string? currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
-        //if (booking?.UserId != currentUserName || currentUserRole == "Admin")
-        //{
-        //    return Forbid("The user trying to delete this booking is not the one who created it");
-        //}
 
         if (booking == null)
         {
@@ -336,6 +330,31 @@ public class BookingController : ControllerBase
             {
                 error = "Booking not found",
                 message = $"No booking found with ID {id}"
+            });
+        }
+
+        // Get current user
+        string? currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (currentUserId == null)
+        {
+            return Unauthorized();
+        }
+
+        User? currentUser = await _userManager.FindByIdAsync(currentUserId);
+        if (currentUser == null)
+        {
+            return Unauthorized();
+        }
+
+        bool isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+
+        // Only allow deletion if user owns the booking OR is admin
+        if (booking.UserId != currentUserId && !isAdmin)
+        {
+            return StatusCode(403, new
+            {
+                error = "Forbidden",
+                message = "You can only delete your own bookings"
             });
         }
 

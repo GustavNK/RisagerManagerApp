@@ -111,16 +111,22 @@ public class UserController : ControllerBase
         }
 
         User? user = await _userManager.FindByIdAsync(userId);
-        return user == null
-            ? NotFound()
-            : Ok(new UserProfileDto
-            {
-                Id = user.Id,
-                Email = user.Email ?? string.Empty,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber
-            });
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+        return Ok(new UserProfileDto
+        {
+            Id = user.Id,
+            Email = user.Email ?? string.Empty,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber,
+            IsAdmin = isAdmin
+        });
     }
 
     /// <summary>

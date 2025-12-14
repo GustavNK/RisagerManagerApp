@@ -15,7 +15,8 @@ export const API_BASE_URL = getApiUrl();
 
 // Create a singleton API instance
 export const api = new Api({
-  baseUrl: getApiUrl(),
+  baseURL: getApiUrl(),
+  withCredentials: true,
 })
 
 // Helper to handle API errors

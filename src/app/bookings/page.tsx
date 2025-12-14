@@ -22,6 +22,15 @@ interface Booking {
   nights: number;
 }
 
+interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  isAdmin: boolean;
+}
+
 interface VacationHouse {
   id: number;
   name: string;
@@ -100,6 +109,20 @@ export default function BookingsPage() {
       return data as Booking[];
     },
   });
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const response = await api.api.userProfileList();
+      return response.data as UserProfile;
+    },
+    enabled: !!user,
+  });
+
+  const canDelete = (booking: Booking) => {
+    if (!profile) return false;
+    return booking.userId === profile.id || profile.isAdmin;
+  };
 
   const deleteBookingMutation = useMutation({
     mutationFn: (bookingId: number) => api.api.bookingsDelete(bookingId),
@@ -268,13 +291,15 @@ export default function BookingsPage() {
                         {booking.totalPrice.toLocaleString('da-DK')} DKK
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <Button
-                          onClick={() => deleteBooking(booking.id)}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          Slet
-                        </Button>
+                        {canDelete(booking) && (
+                          <Button
+                            onClick={() => deleteBooking(booking.id)}
+                            variant="destructive"
+                            size="sm"
+                          >
+                            Slet
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -306,15 +331,17 @@ export default function BookingsPage() {
                     <span>→</span>
                     <span>{formatDate(booking.endDate)}</span>
                   </div>
-                  <div className="flex justify-end">
-                    <Button
-                      onClick={() => deleteBooking(booking.id)}
-                      variant="destructive"
-                      size="sm"
-                    >
-                      Slet
-                    </Button>
-                  </div>
+                  {canDelete(booking) && (
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={() => deleteBooking(booking.id)}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        Slet
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
