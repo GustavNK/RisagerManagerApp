@@ -42,8 +42,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 // Configure cookie for cross-origin requests (frontend and backend on different domains)
 builder.Services.ConfigureApplicationCookie(o =>
 {
-    // SameAsRequest: Secure over HTTPS (production), non-secure over HTTP (local dev)
-    o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    // Always use Secure cookies - required for SameSite=None
+    // Cloudflare terminates HTTPS, so even though internal traffic is HTTP,
+    // the browser sees HTTPS and requires Secure cookies
+    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     o.Cookie.SameSite = SameSiteMode.None; // Required for cross-origin cookie authentication
 });
 
@@ -140,13 +142,16 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Process forwarded headers FIRST (before CORS and Auth)
+// This ensures X-Forwarded-Proto is processed so the app knows the original protocol
+app.UseForwardedHeaders();
+
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1"));
 
 // Use CORS
 app.UseCors("AllowFrontend");
 
-app.UseForwardedHeaders(); 
 app.UseAuthentication();
 app.UseAuthorization();
 
