@@ -14,28 +14,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        if (builder.Environment.IsDevelopment())
-        {
-            // Allow any localhost port for development
-            policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        }
-        else
-        {
-            var allowedOrigins = new[]
+        policy.SetIsOriginAllowed(origin =>
             {
-                "https://risager.vandassen.dk",
-                "http://risager.vandassen.dk",
-                "https://www.risager.vandassen.dk",
-                "http://www.risager.vandassen.dk"
-            };
-            policy.WithOrigins(allowedOrigins)
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        }
+                var host = new Uri(origin).Host;
+                return host == "localhost" ||
+                       host == "risager.vandassen.dk" ||
+                       host == "www.risager.vandassen.dk";
+            })
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
