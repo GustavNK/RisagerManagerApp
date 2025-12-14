@@ -31,39 +31,71 @@ dotnet ef migrations add <name>    # Add new migration
 dotnet ef database update     # Apply migrations to database
 ```
 
-### Docker Development
+### Docker Deployment
 ```bash
-docker compose up -d          # Start PostgreSQL, MinIO, and app containers
-docker compose down           # Stop all containers
+npm run docker:up             # Build and start all containers (nginx, frontend, backend, postgres, minio)
+npm run docker:down           # Stop all containers
+npm run docker:logs           # View container logs
+npm run docker:ps             # Show container status
 npm run docker:clean          # Remove all Docker images, containers, and volumes
 npm run docker:rebuild        # Clean and rebuild all containers
-npm run docker:deploy         # Deploy using docker-deploy.js script
 ```
 
-### Azure Deployment (Legacy)
+### Local Development (without full Docker)
 ```bash
-npm run build-release         # Build both frontend and backend, package for Azure
-npm run deploy-release        # Deploy to Azure App Service
-npm run release              # Combined build and deploy
+# Start only infrastructure services
+docker compose up -d postgres minio minio-init
+
+# Then run frontend and backend locally
+npm run dev                   # Terminal 1: Frontend on localhost:3000
+cd RisagerBackend && dotnet run  # Terminal 2: Backend on localhost:5062
 ```
 
 ## Architecture Overview
 
-### Deployment Strategies
+### Docker Architecture
+The application runs as a multi-container Docker setup with Nginx as the entry point:
 
-**Development (Docker)**: Local containers for PostgreSQL and MinIO, with separate frontend (localhost:3000) and backend (localhost:5062) servers
+```
+                    +------------------+
+                    |     Nginx        |
+                    |    (Port 80)     |
+                    +--------+---------+
+                             |
+              +--------------+--------------+
+              |                             |
+     /api/* routes                    /* routes
+              |                             |
+     +--------v---------+       +-----------v----------+
+     |    Backend       |       |      Frontend        |
+     |   (.NET 8)       |       |    (Next.js SSR)     |
+     |   Port 5062      |       |     Port 3000        |
+     +--------+---------+       +----------------------+
+              |
+     +--------v---------+       +----------------------+
+     |   PostgreSQL     |       |       MinIO          |
+     |   Port 5432      |       |   Ports 9000/9001    |
+     +------------------+       +----------------------+
+```
 
-**Production (Azure - Legacy)**: Single-endpoint deployment where the .NET backend serves both API endpoints AND the Next.js frontend as static files from one Azure App Service
-
-**Future Docker Production**: Can be containerized with Docker Compose orchestrating frontend, backend, PostgreSQL, and MinIO services
+**Services:**
+- **nginx**: Reverse proxy, routes `/api/*` to backend, `/*` to frontend
+- **frontend**: Next.js 15 in standalone mode
+- **backend**: .NET 8 Web API
+- **postgres**: PostgreSQL 16 database
+- **minio**: S3-compatible object storage
+- **minio-init**: One-time bucket initialization
 
 ### Key Configuration Files
-- **`docker-compose.yml`**: Orchestrates PostgreSQL and MinIO containers for local development
+- **`docker-compose.yml`**: Orchestrates all containers with health checks and dependencies
+- **`frontend.Dockerfile`**: Multi-stage build for Next.js (standalone output)
+- **`backend.Dockerfile`**: Multi-stage build for .NET 8 API
+- **`nginx/nginx.conf`**: Reverse proxy routing configuration
 - **`src/lib/api.ts`**: Handles environment-specific API URL routing (localhost:5062 in dev, relative URLs in prod)
-- **`next.config.js`**: Configures static export for production (only when `BUILD_MODE=export`)
-- **`scripts/build-release.js`**: Custom build script that combines frontend and backend deployments for Azure
-- **`RisagerBackend/Program.cs`**: Backend configuration including CORS, Identity, PostgreSQL, and static file serving
+- **`next.config.ts`**: Configures standalone output for production
+- **`RisagerBackend/Program.cs`**: Backend configuration including CORS, Identity, PostgreSQL
 - **`RisagerBackend/appsettings.json`**: Database and storage connection strings
+- **`.env.example`**: Environment variable template for Docker deployment
 
 ### Database Architecture
 - **Provider**: PostgreSQL with Npgsql Entity Framework provider (migrated from Azure SQL)
@@ -126,31 +158,39 @@ The backend uses ASP.NET Core Controllers with attribute routing:
 - Migrations should be tested locally against Docker PostgreSQL before deploying
 
 ### Docker Infrastructure
+- **Nginx**: Port 80 (configurable via APP_PORT), entry point for all requests
+- **Frontend**: Internal port 3000, Next.js standalone server
+- **Backend**: Internal port 5062, .NET 8 API
 - **PostgreSQL**: Port 5432, persistent volume `postgres-data`
 - **MinIO**: Ports 9000 (API) and 9001 (console), persistent volume `minio-data`
-- **App Container**: Port 5062, runs the .NET backend with Dockerfile
 - **Network**: All containers communicate via `risager-network` bridge
+- **Health Checks**: All services have health checks; dependencies wait for healthy status
+- **Bucket Init**: `minio-init` container automatically creates the "risager" bucket on first run
 - **Docker cleanup**: Use `npm run docker:clean` to prevent disk space issues from old images
-- MinIO credentials: minioadmin/minioadmin (default)
-- PostgreSQL credentials injected via environment variables in docker-compose.yml
+- Default credentials (change in production via `.env`):
+  - MinIO: minioadmin/minioadmin
+  - PostgreSQL: postgres/postgres
 
 ### Common Issues
-- **RSC Payload Errors**: If navigation fails, check that `next.config.js` doesn't enable static export in development
-- **CORS Issues**: Backend CORS is configured for localhost:3000, ensure frontend runs on correct port
+- **RSC Payload Errors**: If navigation fails, check that `next.config.ts` is correctly configured
+- **CORS Issues**: Backend CORS is configured for localhost:3000 in dev; in Docker, nginx handles routing (same origin)
 - **Port Conflicts**: Use `npm run dev -- --port 3000` to force frontend to port 3000
-- **Database Connection**: Ensure PostgreSQL container is running (`docker compose up -d`) before starting backend
-- **MinIO Setup**: After first start, create "risager" bucket via console (localhost:9001) for file uploads to work
+- **Port 80 in Use**: Change `APP_PORT` in `.env` to use a different port (e.g., 8080)
+- **Database Connection**: For local dev, ensure PostgreSQL is running (`docker compose up -d postgres`)
+- **MinIO Bucket**: The `minio-init` container creates the bucket automatically; manual setup not needed
 - **Docker Disk Space**: Old images can fill disk; use `npm run docker:clean` regularly
+- **Container Health**: If containers fail to start, check logs with `npm run docker:logs`
 
 ### File Structure Notes
 - Frontend pages: `src/app/*/page.tsx` (login, booking, bookings, feed, profile, users)
 - API utility: `src/lib/api.ts` (environment-aware URL routing)
 - API client: `src/lib/api-client/client.ts` (auto-generated from swagger.json)
 - Backend controllers: `RisagerBackend/Controllers/*Controller.cs` (attribute-routed controllers)
+- Health endpoint: `RisagerBackend/Controllers/HealthController.cs` (Docker health checks)
 - Database context: `RisagerBackend/Data/ApplicationDbContext.cs`
 - Database models: `RisagerBackend/Models/Entities/` and `RisagerBackend/Models/Dtos.cs`
 - Storage service: `RisagerBackend/Services/BlobStorageService.cs` (Azure Blob Storage client)
 - Database seeding: `RisagerBackend/Data/DbSeeder.cs` (admin user initialization)
+- Docker files: `frontend.Dockerfile`, `backend.Dockerfile`, `nginx/nginx.conf`
 - Build artifacts: `bin/` directory (excluded from git)
-- Release package: `bin/risager-app-release.zip` for Azure deployment
 - Swagger schema: `swagger.json` (auto-generated during backend build)
