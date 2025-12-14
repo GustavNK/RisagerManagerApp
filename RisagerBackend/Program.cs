@@ -26,10 +26,10 @@ builder.Services.AddCors(options =>
         {
             var allowedOrigins = new[]
             {
+                "https://risager.vandassen.dk",
+                "http://risager.vandassen.dk",
                 "https://www.risager.vandassen.dk",
-                "http://www.risager.vandassen.dk",
-                "https://www.risagerbe.vandassen.dk",
-                "http://www.risagerbe.vandassen.dk"
+                "http://www.risager.vandassen.dk"
             };
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyMethod()
