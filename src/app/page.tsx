@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Header, Footer, Container } from "@/components/layout";
-import { Button, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { Button } from "@/components/ui";
 
 export default function Home() {
   const [user, setUser] = useState<{ username: string } | null>(null);
