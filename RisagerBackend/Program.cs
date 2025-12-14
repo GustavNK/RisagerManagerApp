@@ -128,9 +128,6 @@ app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1")
 // Use CORS
 app.UseCors("AllowFrontend");
 
-// Enable static files serving
-app.UseStaticFiles();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
