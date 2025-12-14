@@ -24,8 +24,14 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            // In production, allow same-origin requests (frontend served by same server)
-            policy.AllowAnyOrigin()
+            var allowedOrigins = new[]
+            {
+                "https://risagerbe.vandassen.dk",
+                "http://risagerbe.vandassen.dk",
+                "https://www.risagerbe.vandassen.dk",
+                "http://www.risagerbe.vandassen.dk"
+            };
+            policy.WithOrigins(allowedOrigins)
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .AllowCredentials();
