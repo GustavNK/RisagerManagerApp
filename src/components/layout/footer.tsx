@@ -28,11 +28,6 @@ const Footer = React.forwardRef<HTMLElement, FooterProps>(
                     Booking
                   </Link>
                 </li>
-                <li>
-                  <Link href="/feed" className="hover:text-white transition-colors">
-                    Community
-                  </Link>
-                </li>
               </ul>
             </div>
             <div>
@@ -47,7 +42,7 @@ const Footer = React.forwardRef<HTMLElement, FooterProps>(
             </div>
           </div>
           <div className="border-t border-green-700 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 Risager Plantage. Alle rettigheder forbeholdes.</p>
+            <p>&copy; 2025 Nørre Risager Plantage. Alle rettigheder forbeholdes.</p>
           </div>
         </div>
       </footer>
