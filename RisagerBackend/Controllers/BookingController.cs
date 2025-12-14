@@ -194,6 +194,7 @@ public class BookingController : ControllerBase
     /// Create a new booking
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(typeof(string), 200)]
     public async Task<IActionResult> CreateBooking([FromBody] CreateBookingDto bookingDto)
     {
         // Get the currently logged-in user
@@ -318,6 +319,7 @@ public class BookingController : ControllerBase
     /// Delete a booking
     /// </summary>
     [HttpDelete("{id}")]
+    [ProducesResponseType(200)]
     public async Task<IActionResult> DeleteBooking(int id)
     {
         Booking? booking = await _db.Bookings.FindAsync(id);

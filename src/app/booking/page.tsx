@@ -93,7 +93,7 @@ export default function BookingPage() {
       setExpectedPeople(1);
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       const message = getErrorMessage(error);
       setError(message || "Booking mislykkedes. Kontroller venligst dine datoer og prøv igen.");
       setSuccess("");
@@ -206,7 +206,6 @@ export default function BookingPage() {
           {vacationHouses.map((house) => (
             <PropertyCard
               key={house.id}
-              id={house.id}
               name={house.name}
               price={house.price}
               image={house.image}

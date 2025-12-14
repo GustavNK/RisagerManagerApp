@@ -19,9 +19,15 @@ export const api = new Api({
 })
 
 // Helper to handle API errors
-export function getErrorMessage(error: any): string {
-  if (error?.error?.message) return error.error.message
-  if (error?.error) return error.error
-  if (error?.message) return error.message
+export function getErrorMessage(error: unknown): string {
+  if (typeof error === 'object' && error !== null) {
+    const err = error as Record<string, unknown>
+    if (err.error && typeof err.error === 'object') {
+      const innerError = err.error as Record<string, unknown>
+      if (innerError.message && typeof innerError.message === 'string') return innerError.message
+    }
+    if (err.error && typeof err.error === 'string') return err.error
+    if (err.message && typeof err.message === 'string') return err.message
+  }
   return 'Der opstod en fejl'
 }

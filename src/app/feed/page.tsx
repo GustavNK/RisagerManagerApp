@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, getErrorMessage, getApiUrl } from "@/lib/api";
+import { api, getApiUrl } from "@/lib/api";
 import { Header, Container } from "@/components/layout";
 import { Button, Card, Label, Input } from "@/components/ui";
 
@@ -27,12 +26,6 @@ export default function FeedPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
-
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    setUser(null);
-    router.push('/login');
-  };
 
   useEffect(() => {
     const userData = localStorage.getItem('currentUser');
@@ -107,7 +100,7 @@ export default function FeedPage() {
     if (!post.attachmentFileName) return;
 
     try {
-      const response = await fetch(getApiUrl(`/api/posts/download/${post.id}`));
+      const response = await fetch(`${getApiUrl()}/api/posts/download/${post.id}`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);

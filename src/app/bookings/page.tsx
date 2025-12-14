@@ -71,22 +71,7 @@ export default function BookingsPage() {
     });
   };
 
-  const calculateNights = (startDate: string, endDate: string) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const calculateTotalPrice = (startDate: string, endDate: string, expectedPeople: number, propertyId: number) => {
-    const nights = calculateNights(startDate, endDate);
-    const house = vacationHouses.find(h => h.id === propertyId);
-    const pricePerPerson = house?.price || 30;
-    return nights * pricePerPerson * expectedPeople;
-  };
-
-  const { data: bookings = [], isLoading: loading, error: queryError } = useQuery({
+  const { data: bookings = [], isLoading: loading } = useQuery({
     queryKey: ['bookings', selectedHouse?.id, 'future'],
     queryFn: async () => {
       const url = selectedHouse?.id

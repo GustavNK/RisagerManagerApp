@@ -10,6 +10,21 @@
  * ---------------------------------------------------------------
  */
 
+export interface Booking {
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  propertyId?: number;
+  userId?: string | null;
+  user?: User;
+  /** @format date-time */
+  startDate?: string;
+  /** @format date-time */
+  endDate?: string;
+  /** @format int32 */
+  expectedPeople?: number;
+}
+
 export interface BookingWithUserDto {
   /** @format int32 */
   id?: number;
@@ -49,6 +64,21 @@ export interface CreatePostDto {
   authorName?: string | null;
 }
 
+export interface InvitationCodeDto {
+  /** @format int32 */
+  id?: number;
+  code?: string | null;
+  /** @format date-time */
+  createdDate?: string;
+  /** @format date-time */
+  expiryDate?: string;
+  isUsed?: boolean;
+  /** @format date-time */
+  usedDate?: string | null;
+  usedByUserId?: User;
+  createdByUser?: string | null;
+}
+
 export interface LoginDto {
   email?: string | null;
   password?: string | null;
@@ -66,6 +96,27 @@ export interface Payment {
   paymentDate?: string;
 }
 
+export interface Post {
+  /** @format int32 */
+  id?: number;
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  content: string;
+  /** @minLength 1 */
+  authorId: string;
+  authorName?: string | null;
+  attachmentFileName?: string | null;
+  attachmentOriginalName?: string | null;
+  attachmentContentType?: string | null;
+  /** @format int64 */
+  attachmentSize?: number | null;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format date-time */
+  updatedAt?: string;
+}
+
 export interface Property {
   /** @format int32 */
   id?: number;
@@ -79,6 +130,29 @@ export interface UpdateUserDto {
   email?: string | null;
 }
 
+export interface User {
+  id?: string | null;
+  userName?: string | null;
+  normalizedUserName?: string | null;
+  email?: string | null;
+  normalizedEmail?: string | null;
+  emailConfirmed?: boolean;
+  passwordHash?: string | null;
+  securityStamp?: string | null;
+  concurrencyStamp?: string | null;
+  phoneNumber?: string | null;
+  phoneNumberConfirmed?: boolean;
+  twoFactorEnabled?: boolean;
+  /** @format date-time */
+  lockoutEnd?: string | null;
+  lockoutEnabled?: boolean;
+  /** @format int32 */
+  accessFailedCount?: number;
+  firstName?: string | null;
+  lastName?: string | null;
+  bookings?: Booking[] | null;
+}
+
 export interface UserDto {
   email?: string | null;
   password?: string | null;
@@ -86,6 +160,25 @@ export interface UserDto {
   lastName?: string | null;
   phoneNumber?: string | null;
   invitationCode?: string | null;
+}
+
+export interface UserListDto {
+  id?: string | null;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  /** @format date-time */
+  nextBookingDate?: string | null;
+  nextBookingPropertyName?: string | null;
+}
+
+export interface UserProfileDto {
+  id?: string | null;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -149,7 +242,7 @@ export class HttpClient<SecurityDataType = unknown> {
     fetch(...fetchParams);
 
   private baseApiParams: RequestParams = {
-    credentials: "include",
+    credentials: "same-origin",
     headers: {},
     redirect: "follow",
     referrerPolicy: "no-referrer",
@@ -344,7 +437,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title My API
+ * @title Risager API
  * @version v1
  */
 export class Api<
@@ -374,11 +467,12 @@ export class Api<
      * @request POST:/api/Bookings
      */
     bookingsCreate: (data: CreateBookingDto, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<string, any>({
         path: `/api/Bookings`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
@@ -452,9 +546,10 @@ export class Api<
      * @request GET:/api/Payments
      */
     paymentsList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Payment[], any>({
         path: `/api/Payments`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -466,11 +561,12 @@ export class Api<
      * @request POST:/api/Payments
      */
     paymentsCreate: (data: Payment, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Payment, any>({
         path: `/api/Payments`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
@@ -482,9 +578,10 @@ export class Api<
      * @request GET:/api/Posts
      */
     postsList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Post[], any>({
         path: `/api/Posts`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -496,11 +593,12 @@ export class Api<
      * @request POST:/api/Posts
      */
     postsCreate: (data: CreatePostDto, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Post, any>({
         path: `/api/Posts`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
@@ -521,11 +619,12 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<void, any>({
+      this.request<Post, any>({
         path: `/api/Posts/with-file`,
         method: "POST",
         body: data,
         type: ContentType.FormData,
+        format: "json",
         ...params,
       }),
 
@@ -565,9 +664,10 @@ export class Api<
      * @request GET:/api/Propertys
      */
     propertysList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Property[], any>({
         path: `/api/Propertys`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -579,11 +679,12 @@ export class Api<
      * @request POST:/api/Propertys
      */
     propertysCreate: (data: Property, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Property, any>({
         path: `/api/Propertys`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
@@ -627,9 +728,10 @@ export class Api<
      * @request GET:/api/User/profile
      */
     userProfileList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<UserProfileDto, any>({
         path: `/api/User/profile`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -657,9 +759,10 @@ export class Api<
      * @request GET:/api/User/all
      */
     userAllList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<UserListDto[], any>({
         path: `/api/User/all`,
         method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -685,9 +788,25 @@ export class Api<
      * @request POST:/api/User/invitation-codes
      */
     userInvitationCodesCreate: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<InvitationCodeDto, any>({
         path: `/api/User/invitation-codes`,
         method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags User
+     * @name UserInvitationCodesList
+     * @request GET:/api/User/invitation-codes
+     */
+    userInvitationCodesList: (params: RequestParams = {}) =>
+      this.request<InvitationCodeDto[], any>({
+        path: `/api/User/invitation-codes`,
+        method: "GET",
+        format: "json",
         ...params,
       }),
   };

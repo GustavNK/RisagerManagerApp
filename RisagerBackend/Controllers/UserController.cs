@@ -101,6 +101,7 @@ public class UserController : ControllerBase
     /// </summary>
     [HttpGet("profile")]
     [Authorize]
+    [ProducesResponseType(typeof(UserProfileDto), 200)]
     public async Task<IActionResult> GetProfile()
     {
         string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -112,13 +113,13 @@ public class UserController : ControllerBase
         User? user = await _userManager.FindByIdAsync(userId);
         return user == null
             ? NotFound()
-            : Ok(new
+            : Ok(new UserProfileDto
             {
-                id = user.Id,
-                email = user.Email,
-                firstName = user.FirstName,
-                lastName = user.LastName,
-                phoneNumber = user.PhoneNumber
+                Id = user.Id,
+                Email = user.Email ?? string.Empty,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber
             });
     }
 
@@ -166,6 +167,7 @@ public class UserController : ControllerBase
     /// </summary>
     [HttpGet("all")]
     [Authorize]
+    [ProducesResponseType(typeof(List<UserListDto>), 200)]
     public async Task<IActionResult> GetAllUsers()
     {
         List<User> users = await _userManager.Users.ToListAsync();
@@ -230,6 +232,7 @@ public class UserController : ControllerBase
     /// </summary>
     [HttpPost("invitation-codes")]
     [Authorize]
+    [ProducesResponseType(typeof(InvitationCodeDto), 200)]
     public async Task<IActionResult> CreateInvitationCode()
     {
         string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -265,5 +268,31 @@ public class UserController : ControllerBase
                 UsedDate = invitationCode.UsedDate,
                 CreatedByUser = userId
             });
+    }
+
+    /// <summary>
+    /// Get all invitation codes
+    /// </summary>
+    [HttpGet("invitation-codes")]
+    [Authorize]
+    [ProducesResponseType(typeof(List<InvitationCodeDto>), 200)]
+    public async Task<IActionResult> GetInvitationCodes()
+    {
+        List<InvitationCode> invitationCodes = await _context.InvitationCodes
+            .OrderByDescending(ic => ic.CreatedDate)
+            .ToListAsync();
+
+        List<InvitationCodeDto> invitationCodeDtos = invitationCodes.Select(ic => new InvitationCodeDto
+        {
+            Id = ic.Id,
+            Code = ic.Code,
+            CreatedDate = ic.CreatedDate,
+            ExpiryDate = ic.ExpiryDate,
+            IsUsed = ic.IsUsed,
+            UsedDate = ic.UsedDate,
+            CreatedByUser = ic.CreatedByUserId
+        }).ToList();
+
+        return Ok(invitationCodeDtos);
     }
 }

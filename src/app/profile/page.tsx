@@ -35,7 +35,7 @@ export default function ProfilePage() {
     setLoading(false);
   }, []);
 
-  const { data: profile } = useQuery({
+  useQuery({
     queryKey: ['profile'],
     queryFn: async () => {
       const response = await api.api.userProfileList();

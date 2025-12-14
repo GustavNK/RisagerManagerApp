@@ -22,6 +22,7 @@ public class PaymentController : ControllerBase
     /// Get all payments
     /// </summary>
     [HttpGet]
+    [ProducesResponseType(typeof(List<Payment>), 200)]
     public async Task<IActionResult> GetPayments()
     {
         var payments = await _db.Payments.ToListAsync();
@@ -32,6 +33,7 @@ public class PaymentController : ControllerBase
     /// Create a new payment
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(typeof(Payment), 201)]
     public async Task<IActionResult> CreatePayment([FromBody] Payment payment)
     {
         _db.Payments.Add(payment);

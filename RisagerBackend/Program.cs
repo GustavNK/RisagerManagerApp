@@ -97,19 +97,28 @@ builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 var app = builder.Build();
 
-// Seed database with admin user and properties
+// Run database migrations and seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
     try
     {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+
+        // Apply pending migrations
+        logger.LogInformation("Applying database migrations...");
+        await context.Database.MigrateAsync();
+        logger.LogInformation("Database migrations applied successfully.");
+
+        // Seed data
         await DbSeeder.SeedAdminUser(services);
         await DbSeeder.SeedProperties(services);
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
     }
 }
 

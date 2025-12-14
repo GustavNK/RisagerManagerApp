@@ -22,6 +22,7 @@ public class PropertyController : ControllerBase
     /// Get all properties
     /// </summary>
     [HttpGet]
+    [ProducesResponseType(typeof(List<Property>), 200)]
     public async Task<IActionResult> GetProperties()
     {
         var properties = await _db.Properties.ToListAsync();
@@ -32,6 +33,7 @@ public class PropertyController : ControllerBase
     /// Create a new property
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(typeof(Property), 201)]
     public async Task<IActionResult> CreateProperty([FromBody] Property property)
     {
         _db.Properties.Add(property);

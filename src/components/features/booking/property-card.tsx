@@ -3,7 +3,6 @@
 import { cn } from '@/lib/utils'
 
 interface PropertyCardProps {
-  id: number
   name: string
   price: number
   image: string
@@ -11,7 +10,7 @@ interface PropertyCardProps {
   onClick: () => void
 }
 
-export function PropertyCard({ id, name, price, image, isSelected, onClick }: PropertyCardProps) {
+export function PropertyCard({ name, price, image, isSelected, onClick }: PropertyCardProps) {
   return (
     <div
       className={cn(

@@ -25,6 +25,7 @@ public class PostController : ControllerBase
     /// Get all posts
     /// </summary>
     [HttpGet]
+    [ProducesResponseType(typeof(List<Post>), 200)]
     public async Task<IActionResult> GetPosts()
     {
         var posts = await _db.Posts
@@ -37,6 +38,7 @@ public class PostController : ControllerBase
     /// Create a new post
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(typeof(Post), 201)]
     public async Task<IActionResult> CreatePost([FromBody] CreatePostDto postDto)
     {
         var post = new Post
@@ -59,6 +61,7 @@ public class PostController : ControllerBase
     /// </summary>
     [HttpPost("with-file")]
     [DisableRequestSizeLimit]
+    [ProducesResponseType(typeof(Post), 201)]
     public async Task<IActionResult> CreatePostWithFile([FromForm] string title, [FromForm] string content, [FromForm] string authorName, IFormFile? file)
     {
         if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(content) || string.IsNullOrEmpty(authorName))

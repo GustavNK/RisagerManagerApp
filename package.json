@@ -12,6 +12,7 @@
     "release": "npm run build-release && npm run deploy-release",
     "docker:local": "node scripts/docker-deploy.js",
     "docker:package": "node scripts/build-docker-package.js",
+    "docker:deploy-to-server": "node scripts/build-docker-package.js && scp ./bin/risager-docker-deploy.tar.gz root@192.168.0.101:/root/risager",
     "docker:deploy": "node scripts/docker-deploy.js",
     "docker:clean": "docker compose down --rmi all --volumes && docker system prune -af --volumes",
     "docker:rebuild": "npm run docker:clean && docker compose up --build -d"
