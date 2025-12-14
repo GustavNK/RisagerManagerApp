@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 
 namespace RisagerBackend.Data
 {
@@ -8,12 +9,16 @@ namespace RisagerBackend.Data
         {
             UserManager<User> userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             RoleManager<IdentityRole> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
             ILogger<Program> logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
             _ = await roleManager.CreateAsync(new IdentityRole("Admin"));
 
-            const string adminEmail = "admin@risager.dk";
-            const string adminPassword = "admin";
+            // Read admin credentials from configuration (environment variables or appsettings)
+            string adminEmail = configuration["AdminUser:Email"] ?? "admin@risager.dk";
+            string adminPassword = configuration["AdminUser:Password"] ?? "admin";
+            string adminFirstName = configuration["AdminUser:FirstName"] ?? "Administrator";
+            string adminLastName = configuration["AdminUser:LastName"] ?? "User";
 
             // Check if admin user already exists
             User? existingAdmin = await userManager.FindByNameAsync(adminEmail);
@@ -28,8 +33,8 @@ namespace RisagerBackend.Data
             {
                 UserName = adminEmail,
                 Email = adminEmail,
-                FirstName = "Administrator",
-                LastName = "User",
+                FirstName = adminFirstName,
+                LastName = adminLastName,
                 EmailConfirmed = true
             };
 
