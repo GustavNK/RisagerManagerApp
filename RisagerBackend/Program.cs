@@ -136,22 +136,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Fallback to serve the Next.js app for client-side routing
-// Only fallback for non-API routes that don't match static files
-app.MapFallback(async context =>
-{
-    // Don't fallback for API routes
-    if (context.Request.Path.StartsWithSegments("/api"))
-    {
-        context.Response.StatusCode = 404;
-        return;
-    }
-
-    // Serve index.html for all other routes (Next.js will handle client-side routing)
-    context.Response.ContentType = "text/html";
-    await context.Response.SendFileAsync("wwwroot/index.html");
-});
-
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
