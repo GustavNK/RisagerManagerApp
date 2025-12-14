@@ -2,9 +2,9 @@ import { Api } from './api-client/client'
 
 // Get base API URL based on environment
 export const getApiUrl = (): string => {
-  // In production (when running as static export), use relative URLs
-  if (process.env.NODE_ENV === 'production') {
-    return '';
+  // Use environment variable if set (for Docker/production)
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
   }
 
   // In development, use localhost backend
