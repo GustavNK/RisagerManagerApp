@@ -26,8 +26,8 @@ builder.Services.AddCors(options =>
         {
             var allowedOrigins = new[]
             {
-                "https://risagerbe.vandassen.dk",
-                "http://risagerbe.vandassen.dk",
+                "https://www.risager.vandassen.dk",
+                "http://www.risager.vandassen.dk",
                 "https://www.risagerbe.vandassen.dk",
                 "http://www.risagerbe.vandassen.dk"
             };
