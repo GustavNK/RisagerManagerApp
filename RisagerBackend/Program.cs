@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using RisagerBackend.Converters;
 using RisagerBackend.Data;
 using RisagerBackend.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,25 @@ builder.Services.AddCors(options =>
                   .AllowAnyHeader();
         }
     });
+});
+
+// Allow forwarding headers from reverse proxy
+builder.Services.Configure<ForwardedHeadersOptions>(o =>
+{
+    o.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto |
+        ForwardedHeaders.XForwardedHost;
+
+    o.KnownNetworks.Clear();
+    o.KnownProxies.Clear();
+});
+
+// Ensure the cookie is usable for route from https to http
+builder.Services.ConfigureApplicationCookie(o =>
+{
+    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    o.Cookie.SameSite = SameSiteMode.Lax; // use None if you have cross-site redirects/login flows
 });
 
 // Configure Swagger/OpenAPI
@@ -128,6 +148,7 @@ app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1")
 // Use CORS
 app.UseCors("AllowFrontend");
 
+app.UseForwardedHeaders(); 
 app.UseAuthentication();
 app.UseAuthorization();
 
