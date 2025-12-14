@@ -39,11 +39,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
     o.KnownProxies.Clear();
 });
 
-// Ensure the cookie is usable for route from https to http
+// Configure cookie for cross-origin requests (frontend and backend on different domains)
 builder.Services.ConfigureApplicationCookie(o =>
 {
-    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    o.Cookie.SameSite = SameSiteMode.Lax; // use None if you have cross-site redirects/login flows
+    // SameAsRequest: Secure over HTTPS (production), non-secure over HTTP (local dev)
+    o.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    o.Cookie.SameSite = SameSiteMode.None; // Required for cross-origin cookie authentication
 });
 
 // Configure Swagger/OpenAPI
@@ -85,25 +86,27 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 // Configure authentication to return JSON responses for API endpoints
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Events.OnRedirectToLogin = context =>
+    options.Events.OnRedirectToLogin = async context =>
     {
         if (context.Request.Path.StartsWithSegments("/api"))
         {
             context.Response.StatusCode = 401;
-            return Task.CompletedTask;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync("{\"error\":\"Unauthorized\",\"message\":\"You must be logged in to access this resource\"}");
+            return;
         }
         context.Response.Redirect(context.RedirectUri);
-        return Task.CompletedTask;
     };
-    options.Events.OnRedirectToAccessDenied = context =>
+    options.Events.OnRedirectToAccessDenied = async context =>
     {
         if (context.Request.Path.StartsWithSegments("/api"))
         {
             context.Response.StatusCode = 403;
-            return Task.CompletedTask;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync("{\"error\":\"Forbidden\",\"message\":\"You do not have permission to access this resource\"}");
+            return;
         }
         context.Response.Redirect(context.RedirectUri);
-        return Task.CompletedTask;
     };
 });
 
