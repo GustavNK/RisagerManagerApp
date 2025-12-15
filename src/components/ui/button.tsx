@@ -45,7 +45,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'disabled:opacity-50 disabled:cursor-not-allowed',
       sizeClasses[size],
       variantClasses[variant],
-      fullWidth,
+      fullWidth && 'w-full',
       className
     )
 

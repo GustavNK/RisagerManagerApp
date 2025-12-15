@@ -39,11 +39,14 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <button
               onClick={() => setIsRegistering(!isRegistering)}
-              className="text-green-600 hover:text-green-800 font-medium"
+              className={isRegistering
+                ? "text-green-600 hover:text-green-800 font-medium"
+                : "w-full bg-green-100 hover:bg-green-200 text-green-700 font-medium py-2 px-4 rounded-lg transition-colors"
+              }
             >
               {isRegistering
                 ? "Har du allerede en konto? Log ind"
-                : "Mangler du en konto? Opret konto"}
+                : "Opret konto"}
             </button>
           </div>
 

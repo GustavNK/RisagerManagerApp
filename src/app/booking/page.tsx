@@ -237,19 +237,21 @@ export default function BookingPage() {
             {/* Expected People Field */}
             <div className="mb-6">
               <h4 className="text-lg font-semibold text-green-800 mb-4">Antal personer</h4>
-              <Card className="p-4 w-full max-w-full">
+              <Card className="p-4">
                 <Label htmlFor="expectedPeople">
                   Forventet antal personer:
                 </Label>
-                <Input
-                  type="number"
-                  id="expectedPeople"
-                  min="1"
-                  max="20"
-                  value={expectedPeople}
-                  onChange={(e) => setExpectedPeople(parseInt(e.target.value) || 1)}
-                  helperText={`Prisen er ${selectedHouse?.price} DKK pr. person pr. nat`}
-                />
+                <div className="max-w-32">
+                  <Input
+                    type="number"
+                    id="expectedPeople"
+                    min="1"
+                    max="20"
+                    value={expectedPeople}
+                    onChange={(e) => setExpectedPeople(parseInt(e.target.value) || 1)}
+                  />
+                </div>
+                <p className="text-sm text-gray-600 mt-2">{`Prisen er ${selectedHouse?.price} DKK pr. person pr. nat`}</p>
               </Card>
             </div>
 
