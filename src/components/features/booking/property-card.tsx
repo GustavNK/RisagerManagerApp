@@ -8,9 +8,10 @@ interface PropertyCardProps {
   image: string
   isSelected: boolean
   onClick: () => void
+  compact?: boolean
 }
 
-export function PropertyCard({ name, price, image, isSelected, onClick }: PropertyCardProps) {
+export function PropertyCard({ name, price, image, isSelected, onClick, compact }: PropertyCardProps) {
   return (
     <div
       className={cn(
@@ -21,10 +22,10 @@ export function PropertyCard({ name, price, image, isSelected, onClick }: Proper
       )}
       onClick={onClick}
     >
-      <div className="p-6">
-        <div className="text-4xl mb-3 text-center">{image}</div>
-        <h3 className="text-xl font-bold text-green-800 mb-4 text-center">{name}</h3>
-        <div className="text-center">
+      <div className={cn(compact ? 'p-2 md:p-6' : 'p-6')}>
+        <div className={cn('text-center', compact ? 'text-2xl md:text-4xl mb-1 md:mb-3' : 'text-4xl mb-3')}>{image}</div>
+        <h3 className={cn('font-bold text-green-800 text-center', compact ? 'text-sm md:text-xl mb-1 md:mb-4' : 'text-xl mb-4')}>{name}</h3>
+        <div className={cn('text-center', compact && 'hidden md:block')}>
           <span className="text-2xl font-bold text-green-800">{price} DKK</span>
           <span className="text-green-600"> / person</span>
         </div>

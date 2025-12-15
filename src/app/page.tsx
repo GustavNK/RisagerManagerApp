@@ -29,11 +29,11 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-bold text-green-800 mb-6">
               Velkommen til
-              <span className="block text-green-600">Risager Plantage</span>
+              <span className="block text-green-600">Nørre Risager Plantage</span>
             </h2>
             <p className="text-xl text-green-700 mb-12 max-w-5xl mx-auto leading-relaxed font-medium">
               Oplev skovens ro og skønhed i vores fredelige naturtilflugtssted.
-              Omgivet af gamle træer og bakkende landskaber tilbyder Risager Plantage
+              Omgivet af gamle træer og bakkende landskaber tilbyder Nørre Risager Plantage
               en unik flugt ind i naturens omfavnelse.
             </p>
 

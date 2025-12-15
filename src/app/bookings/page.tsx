@@ -192,7 +192,7 @@ export default function BookingsPage() {
         </div>
 
         {/* House Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-3 gap-2 md:gap-6 mb-12 max-w-5xl mx-auto">
           <div
             className={`bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border-2 transition-all cursor-pointer ${
               !selectedHouse
@@ -203,10 +203,10 @@ export default function BookingsPage() {
               setSelectedHouse(null);
             }}
           >
-            <div className="p-6">
-              <div className="text-4xl mb-3 text-center">🏘️</div>
-              <h3 className="text-xl font-bold text-green-800 mb-4 text-center">Alle huse</h3>
-              <div className="text-center">
+            <div className="p-2 md:p-6">
+              <div className="text-2xl md:text-4xl mb-1 md:mb-3 text-center">🏘️</div>
+              <h3 className="text-sm md:text-xl font-bold text-green-800 mb-1 md:mb-4 text-center">Alle huse</h3>
+              <div className="text-center hidden md:block">
                 <span className="text-green-600">Se alle bookinger</span>
               </div>
             </div>
@@ -223,10 +223,10 @@ export default function BookingsPage() {
                 setSelectedHouse(house);
               }}
             >
-              <div className="p-6">
-                <div className="text-4xl mb-3 text-center">{house.image}</div>
-                <h3 className="text-xl font-bold text-green-800 mb-4 text-center">{house.name}</h3>
-                <div className="text-center">
+              <div className="p-2 md:p-6">
+                <div className="text-2xl md:text-4xl mb-1 md:mb-3 text-center">{house.image}</div>
+                <h3 className="text-sm md:text-xl font-bold text-green-800 mb-1 md:mb-4 text-center">{house.name}</h3>
+                <div className="text-center hidden md:block">
                   <span className="text-2xl font-bold text-green-800">{house.price} DKK</span>
                   <span className="text-green-600"> / person</span>
                 </div>

@@ -202,7 +202,7 @@ export default function BookingPage() {
         )}
 
         {/* House Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-2 gap-3 md:gap-6 mb-12 max-w-5xl mx-auto">
           {vacationHouses.map((house) => (
             <PropertyCard
               key={house.id}
@@ -211,6 +211,7 @@ export default function BookingPage() {
               image={house.image}
               isSelected={selectedHouse?.id === house.id}
               onClick={() => handleHouseSelection(house)}
+              compact
             />
           ))}
         </div>
